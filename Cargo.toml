@@ -1,0 +1,11 @@
+[package]
+name = "dijkstras_rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+web-sys = { version = "0.3.70", features = ["Event", "EventTarget"]}
+wasm-bindgen = "0.2"
+yew = { version = "0.20", features = ["csr"] }
+gloo-console = "0.3.0"
+gloo = "0.11.0"

@@ -416,6 +416,13 @@ function __wbg_get_imports() {
         getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
         getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
     };
+    imports.wbg.__wbg_id_8071f78aa2301217 = function(arg0, arg1) {
+        const ret = getObject(arg1).id;
+        const ptr1 = passStringToWasm0(ret, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len1 = WASM_VECTOR_LEN;
+        getDataViewMemory0().setInt32(arg0 + 4 * 1, len1, true);
+        getDataViewMemory0().setInt32(arg0 + 4 * 0, ptr1, true);
+    };
     imports.wbg.__wbg_setclassName_972f4bd6262f9c17 = function(arg0, arg1, arg2) {
         getObject(arg0).className = getStringFromWasm0(arg1, arg2);
     };
@@ -449,8 +456,16 @@ function __wbg_get_imports() {
         const ret = result;
         return ret;
     };
+    imports.wbg.__wbg_ctrlKey_957c6c31b62b4550 = function(arg0) {
+        const ret = getObject(arg0).ctrlKey;
+        return ret;
+    };
     imports.wbg.__wbg_button_460cdec9f2512a91 = function(arg0) {
         const ret = getObject(arg0).button;
+        return ret;
+    };
+    imports.wbg.__wbg_buttons_a302533e27733599 = function(arg0) {
+        const ret = getObject(arg0).buttons;
         return ret;
     };
     imports.wbg.__wbg_instanceof_ShadowRoot_72d8e783f8e0093c = function(arg0) {
@@ -631,12 +646,12 @@ function __wbg_get_imports() {
     imports.wbg.__wbindgen_throw = function(arg0, arg1) {
         throw new Error(getStringFromWasm0(arg0, arg1));
     };
-    imports.wbg.__wbindgen_closure_wrapper3229 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 256, __wbg_adapter_18);
+    imports.wbg.__wbindgen_closure_wrapper3290 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 265, __wbg_adapter_18);
         return addHeapObject(ret);
     };
-    imports.wbg.__wbindgen_closure_wrapper3474 = function(arg0, arg1, arg2) {
-        const ret = makeMutClosure(arg0, arg1, 271, __wbg_adapter_21);
+    imports.wbg.__wbindgen_closure_wrapper3535 = function(arg0, arg1, arg2) {
+        const ret = makeMutClosure(arg0, arg1, 280, __wbg_adapter_21);
         return addHeapObject(ret);
     };
 

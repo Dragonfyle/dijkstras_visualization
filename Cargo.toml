@@ -9,3 +9,4 @@ wasm-bindgen = "0.2"
 yew = { version = "0.20", features = ["csr"] }
 gloo-console = "0.3.0"
 gloo = "0.11.0"
+priority-queue = "2.1.1"

@@ -93,6 +93,7 @@ version = "0.1.0"
 dependencies = [
  "gloo 0.11.0",
  "gloo-console 0.3.0",
+ "priority-queue",
  "wasm-bindgen",
  "web-sys",
  "yew",
@@ -744,6 +745,17 @@ checksum = "6c8646e95016a7a6c4adea95bafa8a16baab64b583356217f2c85db4a39d9a86"
 dependencies = [
  "proc-macro2",
  "syn 1.0.109",
+]
+
+[[package]]
+name = "priority-queue"
+version = "2.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "714c75db297bc88a63783ffc6ab9f830698a6705aa0201416931759ef4c8183d"
+dependencies = [
+ "autocfg",
+ "equivalent",
+ "indexmap 2.5.0",
 ]
 
 [[package]]

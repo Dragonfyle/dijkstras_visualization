@@ -454,8 +454,8 @@ pub fn Board() -> Html {
                     <div class="flex items-center flex-col gap-2 text-zinc-500">
                         <p>{"Left Click: "}<span class="pl-4">{"set "}</span><span class="text-green-500">{"start "}</span><span>{" node"}</span></p>
                         <p>{"Right Click: "}<span class="pl-4">{"set "}</span><span class="text-red-700">{"end"}</span><span>{" node"}</span></p>
-                        <p>{"Ctrl + Click: "}<span class="pl-4">{"activate "}</span><span>{"node"}</span></p>
-                        <p>{"Shift + Click: "}<span class="pl-4">{"deactivate "}</span><span>{"node"}</span></p>
+                        <p>{"Ctrl + Click: "}<span class="pl-4">{"deactivate "}</span><span>{"node"}</span></p>
+                        <p>{"Shift + Click: "}<span class="pl-4">{"activate "}</span><span>{"node"}</span></p>
                     </div>
                 </div>
                     <div class="flex flex-col gap-6">

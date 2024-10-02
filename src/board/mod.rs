@@ -439,20 +439,30 @@ pub fn Board() -> Html {
 
     html! {
         <>
-            <div class="flex gap-20 justify-center items-center bg-gray-900 h-screen w-screen">
-                 <div
-                    class="grid gap-0.25 grid-cols-50 grid-rows-50 bg-gray-900 h-800 w-800 border-2 border-teal-700 "
-                    onclick={handle_click}
-                    oncontextmenu={handle_context_menu}
-                    onmouseover={handle_mouse_over}
-                    ondragstart={handle_drag_start}
-                    >
-                    {squares.borrow().iter().map(|SquareNode {node, ..}| node.clone()).collect::<Html>()}
-                 </div>
+            <div class="flex  gap-20 justify-center items-center bg-gray-900 h-screen w-screen">
+                <div class="flex flex-col gap-6">
+                    <div
+                       class="grid gap-0.25 grid-cols-50 grid-rows-50 bg-gray-900 h-800 w-800 border-2 border-teal-700 "
+                       onclick={handle_click}
+                       oncontextmenu={handle_context_menu}
+                       onmouseover={handle_mouse_over}
+                       ondragstart={handle_drag_start}
+                       >
+                       {squares.borrow().iter().map(|SquareNode {node, ..}| node.clone()).collect::<Html>()}
+                    </div>
 
-                 <button class="text-white" onclick={handle_create_adjacency_list}>{"Find Path"}</button>
-                 <button class="text-white" onclick={handle_clear_traversed_nodes}>{"Clear Path"}</button>
-                 <button class="text-white" onclick={handle_clear_board}>{"Reset board"}</button>
+                    <div class="flex items-center flex-col gap-2 text-zinc-500">
+                        <p>{"Left Click: "}<span class="pl-4">{"set "}</span><span class="text-green-500">{"start "}</span><span>{" node"}</span></p>
+                        <p>{"Right Click: "}<span class="pl-4">{"set "}</span><span class="text-red-700">{"end"}</span><span>{" node"}</span></p>
+                        <p>{"Ctrl + Click: "}<span class="pl-4">{"activate "}</span><span>{"node"}</span></p>
+                        <p>{"Shift + Click: "}<span class="pl-4">{"deactivate "}</span><span>{"node"}</span></p>
+                    </div>
+                </div>
+                    <div class="flex flex-col gap-6">
+                       <button class="text-white border-2 border-green-600 p-2 rounded-md hover:bg-green-600 hover:text-black" onclick={handle_create_adjacency_list}>{"Find shortest Path"}</button>
+                       <button class="text-white border-2 border-emerald-900 p-2 rounded-md hover:bg-emerald-900 hover:text-black" onclick={handle_clear_traversed_nodes}>{"Clear Path"}</button>
+                       <button class="text-white border-2 border-red-800 p-2 rounded-md hover:bg-red-800 hover:text-black" onclick={handle_clear_board}>{"Reset board"}</button>
+                    </div>
             </div>
         </>
     }

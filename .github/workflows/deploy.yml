@@ -22,7 +22,7 @@ jobs:
         run: cargo install trunk wasm-bindgen-cli
 
       - name: Build with trunk
-        run: trunk build --release
+        run: trunk build --release --public-url /${GITHUB_REPOSITORY#*/}/
 
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4

@@ -1,5 +1,5 @@
 use crate::utils;
-use crate::{adjacency_list, adjacency_list::AdjacencyEntry, SquareStatus};
+use crate::{adjacency_list, adjacency_list::AdjacencyEntry, NodeStatus};
 use priority_queue::{self, DoublePriorityQueue};
 
 pub struct DijkstrasResult {
@@ -67,21 +67,21 @@ fn dijkstras(
 }
 
 pub fn get_traversed_nodes(
-    squares: Vec<SquareStatus>,
+    nodes: Vec<NodeStatus>,
     start_square_id: usize,
     end_square_id: usize,
 ) -> TraversedNodesResult {
-    let num_squares = squares.len();
+    let num_nodes = nodes.len();
     assert!(
-        end_square_id < num_squares,
+        end_square_id < num_nodes,
         "End square ID is out of bounds"
     );
     assert!(
-        start_square_id < num_squares,
+        start_square_id < num_nodes,
         "Start square ID is out of bounds"
     );
 
-    let adjacency_list = adjacency_list::create_adjacency_list(&squares);
+    let adjacency_list = adjacency_list::create_adjacency_list(&nodes);
     let mut result = dijkstras(adjacency_list, start_square_id, end_square_id);
 
     utils::drop_first_and_last(&mut result.visited_ordered);
@@ -122,7 +122,7 @@ mod tests {
     #[test]
     fn dijkstras_returns_correct_result() {
         let mock_grid = tests_common::get_mock_grid();
-        let mock_square_statuses = tests_common::get_mock_squares(mock_grid);
+        let mock_square_statuses = tests_common::get_mock_nodes(mock_grid);
         let adjacency_list = adjacency_list::create_adjacency_list(&mock_square_statuses);
         let expected_distance = 22;
         let start_node_id = 0;
@@ -136,7 +136,7 @@ mod tests {
     #[test]
     fn get_path_returns_correct_path() {
         let mock_grid = tests_common::get_mock_grid();
-        let mock_square_statuses = tests_common::get_mock_squares(mock_grid);
+        let mock_square_statuses = tests_common::get_mock_nodes(mock_grid);
         let num_expected_nodes = 21;
         let expected_path = vec![
             10, 20, 30, 40, 50, 60, 61, 62, 63, 64, 65, 66, 56, 46, 47, 48, 49, 39, 29, 19, 9,
@@ -166,7 +166,7 @@ mod tests {
     #[test]
     fn get_path_returns_empty_path_when_end_unreachable() {
         let mock_grid = tests_common::get_mock_grid_with_unreachable_end();
-        let mock_square_statuses = tests_common::get_mock_squares(mock_grid);
+        let mock_square_statuses = tests_common::get_mock_nodes(mock_grid);
 
         let start_node_id = 0;
         let end_node_id = 8;

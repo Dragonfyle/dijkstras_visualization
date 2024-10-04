@@ -1,4 +1,4 @@
-use crate::SquareStatus;
+use crate::NodeStatus;
 
 pub fn get_mock_grid() -> Vec<usize> {
     vec![
@@ -9,15 +9,15 @@ pub fn get_mock_grid() -> Vec<usize> {
     ]
 }
 
-pub fn get_mock_squares(mock_grid: Vec<usize>) -> Vec<SquareStatus> {
+pub fn get_mock_nodes(mock_grid: Vec<usize>) -> Vec<NodeStatus> {
     mock_grid
         .iter()
-        .map(|square| match square {
-            0 => SquareStatus::On,
-            1 => SquareStatus::Off,
-            2 => SquareStatus::Start,
-            3 => SquareStatus::End,
-            _ => SquareStatus::On,
+        .map(|node| match node {
+            0 => NodeStatus::On,
+            1 => NodeStatus::Off,
+            2 => NodeStatus::Start,
+            3 => NodeStatus::End,
+            _ => NodeStatus::On,
         })
         .collect()
 }

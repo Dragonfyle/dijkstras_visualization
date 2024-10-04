@@ -1,7 +1,16 @@
-use crate::SquareStatus;
+use crate::NodeStatus;
 use crate::{DEFAULT_COLOR, END_COLOR, OFF_COLOR, PATH_COLOR, START_COLOR, VISITED_COLOR};
+use std::rc::Rc;
+use std::cell::RefCell;
+use crate::board::GridNode;
 use web_sys::HtmlElement;
 use yew::MouseEvent;
+
+pub enum Button {
+    Left,
+    Right,
+    Other,
+}
 
 pub enum ModifierKey {
     Ctrl,
@@ -9,19 +18,46 @@ pub enum ModifierKey {
     None,
 }
 
-pub fn set_square_color(node: &HtmlElement, square_status: SquareStatus) {
-    match square_status {
-        SquareStatus::On => node.set_class_name(DEFAULT_COLOR),
-        SquareStatus::Off => node.set_class_name(OFF_COLOR),
-        SquareStatus::Start => node.set_class_name(START_COLOR),
-        SquareStatus::End => node.set_class_name(END_COLOR),
-        SquareStatus::Path => node.set_class_name(PATH_COLOR),
-        SquareStatus::Visited => node.set_class_name(VISITED_COLOR),
+pub enum MouseAction {
+    Click,
+    Move,
+}
+
+pub enum ButtonWithModifierKey {
+    Left(ModifierKey),
+    Right(),
+    Other(),
+}
+
+pub fn get_click_button(event: &MouseEvent) -> Button {
+    match event.button() {
+        0 => Button::Left,
+        2 => Button::Right,
+        _ => Button::Other,
     }
 }
 
-pub fn set_square_status(square_status_map_entry: &mut SquareStatus, new_status: SquareStatus) {
-    *square_status_map_entry = new_status;
+pub fn get_move_button(event: &MouseEvent) -> Button {
+    match event.buttons() {
+        1 => Button::Left,
+        2 => Button::Right,
+        _ => Button::Other,
+    }
+}
+
+pub fn set_square_color(node: &HtmlElement, node_status: NodeStatus) {
+    match node_status {
+        NodeStatus::On => node.set_class_name(DEFAULT_COLOR),
+        NodeStatus::Off => node.set_class_name(OFF_COLOR),
+        NodeStatus::Start => node.set_class_name(START_COLOR),
+        NodeStatus::End => node.set_class_name(END_COLOR),
+        NodeStatus::Path => node.set_class_name(PATH_COLOR),
+        NodeStatus::Visited => node.set_class_name(VISITED_COLOR),
+    }
+}
+
+pub fn set_node_status(node_status_map_entry: &mut NodeStatus, new_status: NodeStatus) {
+    *node_status_map_entry = new_status;
 }
 
 pub fn drop_first_and_last<T>(vec: &mut Vec<T>) {
@@ -29,18 +65,18 @@ pub fn drop_first_and_last<T>(vec: &mut Vec<T>) {
     vec.pop();
 }
 
-pub fn set_square_on(node_ref: HtmlElement, square_status_map_entry: &mut SquareStatus) {
-    set_square_color(&node_ref, SquareStatus::On);
-    set_square_status(square_status_map_entry, SquareStatus::On);
+pub fn set_node_on(node_ref: HtmlElement, node_status_map_entry: &mut NodeStatus) {
+    set_square_color(&node_ref, NodeStatus::On);
+    set_node_status(node_status_map_entry, NodeStatus::On);
 }
 
-pub fn set_square_off(node_ref: HtmlElement, square_status_map_entry: &mut SquareStatus) {
-    set_square_color(&node_ref, SquareStatus::Off);
-    set_square_status(square_status_map_entry, SquareStatus::Off);
+pub fn set_node_off(node_ref: HtmlElement, node_status_map_entry: &mut NodeStatus) {
+    set_square_color(&node_ref, NodeStatus::Off);
+    set_node_status(node_status_map_entry, NodeStatus::Off);
 }
 
-pub fn is_square_toggleable(square_status_map_entry: &SquareStatus) -> bool {
-    *square_status_map_entry != SquareStatus::On && *square_status_map_entry != SquareStatus::Off
+pub fn is_node_toggleable(node_status_map_entry: &NodeStatus) -> bool {
+    *node_status_map_entry == NodeStatus::On || *node_status_map_entry == NodeStatus::Off
 }
 
 pub fn get_modifier_key(event: &MouseEvent) -> ModifierKey {
@@ -50,5 +86,78 @@ pub fn get_modifier_key(event: &MouseEvent) -> ModifierKey {
             true => ModifierKey::Shift,
             false => ModifierKey::None,
         },
+    }
+}
+
+pub fn set_start_node(
+    nodes: &Rc<RefCell<Vec<GridNode>>>,
+    node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
+    new_start_id: usize,
+    current_start_node_id: Rc<RefCell<Option<usize>>>,
+) {
+    if let Some(id) = current_start_node_id.borrow().as_ref() {
+        let nodes_borrow = nodes.borrow();
+        if let Some(previous_start_node) = nodes_borrow.get(*id) {
+            if let Some(previous_start_node) =
+                previous_start_node.node_ref.cast::<HtmlElement>()
+            {
+                set_square_color(&previous_start_node, NodeStatus::On);
+                set_node_status(
+                    &mut node_status_map.borrow_mut()[*id],
+                    NodeStatus::On,
+                );
+            }
+        }
+    }
+
+    if let Some(new_start_node) = nodes
+        .borrow()
+        .get(new_start_id)
+        .unwrap()
+        .node_ref
+        .cast::<HtmlElement>()
+    {
+        set_square_color(&new_start_node, NodeStatus::Start);
+        set_node_status(
+            &mut node_status_map.borrow_mut()[new_start_id],
+            NodeStatus::Start,
+        );
+        current_start_node_id.borrow_mut().replace(new_start_id);
+    }
+}
+
+pub fn set_end_node(
+    nodes: &Rc<RefCell<Vec<GridNode>>>,
+    node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
+    new_end_id: usize,
+    current_end_node_id: Rc<RefCell<Option<usize>>>,
+) {
+    if let Some(id) = current_end_node_id.borrow().as_ref() {
+        let nodes_borrow = nodes.borrow();
+        if let Some(previous_end_node) = nodes_borrow.get(*id) {
+            if let Some(previous_end_node) = previous_end_node.node_ref.cast::<HtmlElement>()
+            {
+                set_square_color(&previous_end_node, NodeStatus::On);
+                set_node_status(
+                    &mut node_status_map.borrow_mut()[*id],
+                    NodeStatus::On,
+                );
+            }
+        }
+    }
+
+    if let Some(new_end_node) = nodes
+        .borrow()
+        .get(new_end_id)
+        .unwrap()
+        .node_ref
+        .cast::<HtmlElement>()
+    {
+        set_square_color(&new_end_node, NodeStatus::End);
+        set_node_status(
+            &mut node_status_map.borrow_mut()[new_end_id],
+            NodeStatus::End,
+        );
+        current_end_node_id.borrow_mut().replace(new_end_id);
     }
 }

@@ -546,16 +546,16 @@ video {
   display: grid;
 }
 
-.h-800 {
-  height: 800px;
+.h-400 {
+  height: 400px;
 }
 
 .h-screen {
   height: 100vh;
 }
 
-.w-800 {
-  width: 800px;
+.w-400 {
+  width: 400px;
 }
 
 .w-screen {
@@ -706,4 +706,24 @@ video {
 .hover\:text-black:hover {
   --tw-text-opacity: 1;
   color: rgb(0 0 0 / var(--tw-text-opacity));
+}
+
+@media (min-width: 1024px) {
+  .lg\:h-600 {
+    height: 600px;
+  }
+
+  .lg\:w-600 {
+    width: 600px;
+  }
+}
+
+@media (min-width: 1536px) {
+  .\32xl\:h-800 {
+    height: 800px;
+  }
+
+  .\32xl\:w-800 {
+    width: 800px;
+  }
 }

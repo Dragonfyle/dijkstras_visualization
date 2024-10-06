@@ -1,5 +1,6 @@
+use crate::board::GridNode;
 use crate::utils;
-use crate::{adjacency_list, adjacency_list::AdjacencyEntry, NodeStatus};
+use crate::{adjacency_list, adjacency_list::AdjacencyEntry};
 use priority_queue::{self, DoublePriorityQueue};
 
 pub struct DijkstrasResult {
@@ -67,7 +68,7 @@ fn dijkstras(
 }
 
 pub fn get_traversed_nodes(
-    nodes: Vec<NodeStatus>,
+    nodes: &Vec<GridNode>,
     start_square_id: usize,
     end_square_id: usize,
 ) -> TraversedNodesResult {
@@ -149,7 +150,7 @@ mod tests {
         let start_node_id = 0;
         let end_node_id = 8;
 
-        let result = get_traversed_nodes(mock_square_statuses, start_node_id, end_node_id);
+        let result = get_traversed_nodes(&mock_square_statuses, start_node_id, end_node_id);
         let path = result.path;
         let visited_ordered = result.visited_ordered;
 
@@ -171,7 +172,7 @@ mod tests {
         let start_node_id = 0;
         let end_node_id = 8;
 
-        let result = get_traversed_nodes(mock_square_statuses, start_node_id, end_node_id);
+        let result = get_traversed_nodes(&mock_square_statuses, start_node_id, end_node_id);
         let path = result.path;
 
         assert!(path.is_empty());

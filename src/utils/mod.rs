@@ -1,7 +1,7 @@
 use crate::NodeStatus;
 use crate::{DEFAULT_COLOR, END_COLOR, OFF_COLOR, PATH_COLOR, START_COLOR, VISITED_COLOR};
 use std::rc::Rc;
-use std::cell::RefCell;
+use std::cell::{RefCell, RefMut};
 use crate::board::GridNode;
 use web_sys::HtmlElement;
 use yew::MouseEvent;
@@ -90,36 +90,29 @@ pub fn get_modifier_key(event: &MouseEvent) -> ModifierKey {
 }
 
 pub fn set_start_node(
-    nodes: &Rc<RefCell<Vec<GridNode>>>,
-    node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
+    mut nodes: RefMut<Vec<GridNode>>,
     new_start_id: usize,
     current_start_node_id: Rc<RefCell<Option<usize>>>,
 ) {
     if let Some(id) = current_start_node_id.borrow().as_ref() {
-        let nodes_borrow = nodes.borrow();
-        if let Some(previous_start_node) = nodes_borrow.get(*id) {
+        if let Some(previous_start_node) = nodes.get(*id) {
             if let Some(previous_start_node) =
                 previous_start_node.node_ref.cast::<HtmlElement>()
             {
                 set_square_color(&previous_start_node, NodeStatus::On);
                 set_node_status(
-                    &mut node_status_map.borrow_mut()[*id],
+                    &mut nodes[*id].node_status,
                     NodeStatus::On,
                 );
             }
         }
     }
 
-    if let Some(new_start_node) = nodes
-        .borrow()
-        .get(new_start_id)
-        .unwrap()
-        .node_ref
-        .cast::<HtmlElement>()
+    if let Some(new_start_node) = nodes.get(new_start_id).unwrap().node_ref.cast::<HtmlElement>()
     {
         set_square_color(&new_start_node, NodeStatus::Start);
         set_node_status(
-            &mut node_status_map.borrow_mut()[new_start_id],
+            &mut nodes[new_start_id].node_status,
             NodeStatus::Start,
         );
         current_start_node_id.borrow_mut().replace(new_start_id);
@@ -127,35 +120,28 @@ pub fn set_start_node(
 }
 
 pub fn set_end_node(
-    nodes: &Rc<RefCell<Vec<GridNode>>>,
-    node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
+    mut nodes: RefMut<Vec<GridNode>>,
     new_end_id: usize,
     current_end_node_id: Rc<RefCell<Option<usize>>>,
 ) {
     if let Some(id) = current_end_node_id.borrow().as_ref() {
-        let nodes_borrow = nodes.borrow();
-        if let Some(previous_end_node) = nodes_borrow.get(*id) {
+        if let Some(previous_end_node) = nodes.get(*id) {
             if let Some(previous_end_node) = previous_end_node.node_ref.cast::<HtmlElement>()
             {
                 set_square_color(&previous_end_node, NodeStatus::On);
                 set_node_status(
-                    &mut node_status_map.borrow_mut()[*id],
+                    &mut nodes[*id].node_status,
                     NodeStatus::On,
                 );
             }
         }
     }
 
-    if let Some(new_end_node) = nodes
-        .borrow()
-        .get(new_end_id)
-        .unwrap()
-        .node_ref
-        .cast::<HtmlElement>()
+    if let Some(new_end_node) = nodes.get(new_end_id).unwrap().node_ref.cast::<HtmlElement>()
     {
         set_square_color(&new_end_node, NodeStatus::End);
         set_node_status(
-            &mut node_status_map.borrow_mut()[new_end_id],
+            &mut nodes[new_end_id].node_status,
             NodeStatus::End,
         );
         current_end_node_id.borrow_mut().replace(new_end_id);

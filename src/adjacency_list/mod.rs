@@ -1,4 +1,4 @@
-use crate::NodeStatus;
+use crate::{board::GridNode, NodeStatus};
 
 #[derive(Debug, Hash)]
 pub struct Edge {
@@ -10,8 +10,8 @@ pub struct AdjacencyEntry {
     pub edges: Vec<Edge>,
 }
 
-fn is_node_on(node_id: usize, node_status_map: &Vec<NodeStatus>) -> bool {
-    if let NodeStatus::Off = node_status_map[node_id] {
+fn is_node_on(node_id: usize, nodes: &Vec<GridNode>) -> bool {
+    if let NodeStatus::Off = nodes[node_id].node_status {
         return false;
     }
 
@@ -22,38 +22,38 @@ fn add_edge(edges: &mut Vec<Edge>, to: usize, weight: usize) {
     edges.push(Edge { to, weight });
 }
 
-fn get_edges_to_neighbors(node_id: usize, node_status_map: &Vec<NodeStatus>) -> Vec<Edge> {
+fn get_edges_to_neighbors(node_id: usize, nodes: &Vec<GridNode>) -> Vec<Edge> {
     let mut edges_to_neighbors = Vec::new();
-    let side_length = (node_status_map.len() as f64).sqrt() as usize;
+    let side_length = (nodes.len() as f64).sqrt() as usize;
     let row = node_id / side_length;
     let col = node_id % side_length;
 
     //the value 1 is the edge weight. here all edges have the same weight for demo purposes
-    if col > 0 && is_node_on(node_id - 1, node_status_map) {
+    if col > 0 && is_node_on(node_id - 1, nodes) {
         add_edge(&mut edges_to_neighbors, node_id - 1, 1);
     }
 
-    if col < side_length - 1 && is_node_on(node_id + 1, node_status_map) {
+    if col < side_length - 1 && is_node_on(node_id + 1, nodes) {
         add_edge(&mut edges_to_neighbors, node_id + 1, 1);
     }
 
-    if row > 0 && is_node_on(node_id - side_length, node_status_map) {
+    if row > 0 && is_node_on(node_id - side_length, nodes) {
         add_edge(&mut edges_to_neighbors, node_id - side_length, 1);
     }
 
-    if row < side_length - 1 && is_node_on(node_id + side_length, node_status_map) {
+    if row < side_length - 1 && is_node_on(node_id + side_length, nodes) {
         add_edge(&mut edges_to_neighbors, node_id + side_length, 1);
     }
 
     edges_to_neighbors
 }
 
-pub fn create_adjacency_list(node_status_map: &Vec<NodeStatus>) -> Vec<AdjacencyEntry> {
-    node_status_map
+pub fn create_adjacency_list(nodes: &Vec<GridNode>) -> Vec<AdjacencyEntry> {
+    nodes
         .iter()
         .enumerate()
         .map(|(i, _node)| AdjacencyEntry {
-            edges: get_edges_to_neighbors(i, node_status_map),
+            edges: get_edges_to_neighbors(i, nodes),
         })
         .collect()
 }

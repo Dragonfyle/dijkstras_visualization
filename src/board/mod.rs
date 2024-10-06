@@ -12,18 +12,20 @@ use crate::grid_actions::{GridAction, TouchSquare, GridState};
 use crate::utils::MouseAction;
 
 pub struct GridNode {
-    node: VNode,
+    pub node: VNode,
     pub node_ref: NodeRef,
+    pub node_status: NodeStatus,
 }
 
 impl GridNode {
-    fn build(id: usize) -> Self {
+    pub fn build(id: usize) -> Self {
         let node_ref = NodeRef::default();
         GridNode {
             node: html! {
                 <div class={DEFAULT_COLOR} id={id.to_string()} ref={node_ref.clone()}></div>
             },
             node_ref,
+            node_status: NodeStatus::On,
         }
     }
 }
@@ -31,7 +33,6 @@ impl GridNode {
 #[function_component]
 pub fn Board() -> Html {
     let nodes = use_state(|| create_nodes());
-    let node_satus_map = use_mut_ref(|| vec![NodeStatus::On; GRID_SIZE]);
     let current_start_node_id = use_mut_ref(|| Option::<usize>::None);
     let current_end_node_id = use_mut_ref(|| Option::<usize>::None);
     let is_first_render = use_mut_ref(|| true);
@@ -41,7 +42,7 @@ pub fn Board() -> Html {
         let nodes = Rc::clone(&nodes);
         let current_start_node_id = Rc::clone(&current_start_node_id);
         let current_end_node_id = Rc::clone(&current_end_node_id);
-        let node_status_map = Rc::clone(&node_satus_map);
+        // let node_status_map = Rc::clone(&node_satus_map);
 
         use_effect(move || {
             let is_not_first_render = !*is_first_render.borrow();
@@ -51,10 +52,9 @@ pub fn Board() -> Html {
 
             *is_first_render.borrow_mut() = false;
 
-            utils::set_start_node(&nodes, &node_status_map, 0, current_start_node_id);
+            utils::set_start_node(nodes.borrow_mut(), 0, current_start_node_id);
             utils::set_end_node(
-                &nodes,
-                &node_status_map,
+                nodes.borrow_mut(),
                 GRID_SIZE - 1,
                 current_end_node_id,
             );
@@ -69,7 +69,6 @@ pub fn Board() -> Html {
 
     let handle_click = {
         let nodes = Rc::clone(&nodes);
-        let node_status_map = Rc::clone(&node_satus_map);
         let current_start_node_id = Rc::clone(&current_start_node_id);
         let current_end_node_id = Rc::clone(&current_end_node_id);
 
@@ -77,7 +76,6 @@ pub fn Board() -> Html {
             event.prevent_default();
             let grid_state = GridState::new(
                 Rc::clone(&nodes),
-                Rc::clone(&node_status_map),
                 Rc::clone(&current_start_node_id),
                 Rc::clone(&current_end_node_id),
             );
@@ -92,7 +90,6 @@ pub fn Board() -> Html {
 
     let handle_mouse_over = {
         let nodes = Rc::clone(&nodes);
-        let node_status_map = Rc::clone(&node_satus_map);
         let current_start_node_id = Rc::clone(&current_start_node_id);
         let current_end_node_id = Rc::clone(&current_end_node_id);
 
@@ -100,7 +97,6 @@ pub fn Board() -> Html {
             event.prevent_default();
             let grid_state = GridState::new(
                 Rc::clone(&nodes),
-                Rc::clone(&node_status_map),
                 Rc::clone(&current_start_node_id),
                 Rc::clone(&current_end_node_id),
             );
@@ -116,13 +112,11 @@ pub fn Board() -> Html {
         let nodes = Rc::clone(&nodes);
         let current_end_node_id = Rc::clone(&current_end_node_id);
         let current_start_node_id = Rc::clone(&current_start_node_id);
-        let node_status_map = Rc::clone(&node_satus_map);
 
         Callback::from(move |event: MouseEvent| {
             event.prevent_default();
             let grid_state = GridState::new(
                 Rc::clone(&nodes),
-                Rc::clone(&node_status_map),
                 Rc::clone(&current_start_node_id),
                 Rc::clone(&current_end_node_id),
             );
@@ -147,17 +141,16 @@ pub fn Board() -> Html {
 
     fn clear_traversed_nodes(
         nodes: &Rc<RefCell<Vec<GridNode>>>,
-        node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
     ) {
+        let mut nodes_borrow = nodes.borrow_mut();
         (0..GRID_SIZE).for_each(|i| {
-            if let Some(node_ref) = nodes
-                .borrow()
+            if let Some(node_ref) = nodes_borrow
                 .get(i)
                 .unwrap()
                 .node_ref
                 .cast::<HtmlElement>()
             {
-                let node_status_map_entry = &mut node_status_map.borrow_mut()[i];
+                let node_status_map_entry = &mut nodes_borrow[i].node_status;
                 if *node_status_map_entry == NodeStatus::Visited
                     || *node_status_map_entry == NodeStatus::Path
                 {
@@ -170,31 +163,27 @@ pub fn Board() -> Html {
 
     fn clear_board(
         nodes: &Rc<RefCell<Vec<GridNode>>>,
-        node_status_map: &Rc<RefCell<Vec<NodeStatus>>>,
         current_start_node_id: Rc<RefCell<Option<usize>>>,
         current_end_node_id: Rc<RefCell<Option<usize>>>,
     ) {
-        let node_status_map2 = Rc::clone(&node_status_map);
+        let mut nodes_borrow = nodes.borrow_mut();
         (0..GRID_SIZE).for_each(|i| {
-            let node_status_map = Rc::clone(node_status_map);
-            node_status_map.borrow_mut()[i] = NodeStatus::On;
-            if let Some(node_ref) = nodes
-                .borrow()
+            nodes_borrow[i].node_status = NodeStatus::On;
+            if let Some(node_ref) = nodes_borrow
                 .get(i)
                 .unwrap()
                 .node_ref
                 .cast::<HtmlElement>()
             {
-                utils::set_node_on(node_ref, &mut node_status_map.borrow_mut()[i]);
+                utils::set_node_on(node_ref, &mut nodes_borrow[i].node_status);
             }
         });
 
         *current_start_node_id.borrow_mut() = None;
         *current_end_node_id.borrow_mut() = None;
-        utils::set_start_node(&nodes, &node_status_map2, 0, current_start_node_id);
+        utils::set_start_node(nodes_borrow, 0, current_start_node_id);
         utils::set_end_node(
-            &nodes,
-            &node_status_map2,
+            nodes.borrow_mut(),
             GRID_SIZE - 1,
             current_end_node_id,
         );
@@ -202,7 +191,6 @@ pub fn Board() -> Html {
 
 
     let handle_clear_board = {
-        let node_status_map = Rc::clone(&node_satus_map);
         let nodes = Rc::clone(&nodes);
         let current_start_node_id = Rc::clone(&current_start_node_id);
         let current_end_node_id = Rc::clone(&current_end_node_id);
@@ -217,7 +205,6 @@ pub fn Board() -> Html {
             let current_end_node_id = Rc::clone(&current_end_node_id);
             clear_board(
                 &nodes,
-                &node_status_map,
                 current_start_node_id,
                 current_end_node_id,
             );
@@ -225,7 +212,6 @@ pub fn Board() -> Html {
     };
 
     let handle_clear_traversed_nodes = {
-        let node_status_map = Rc::clone(&node_satus_map);
         let nodes = Rc::clone(&nodes);
         let is_running = Rc::clone(&is_running);
 
@@ -234,12 +220,11 @@ pub fn Board() -> Html {
                 return;
             }
 
-            clear_traversed_nodes(&nodes, &node_status_map);
+            clear_traversed_nodes(&nodes);
         })
     };
 
     let handle_create_adjacency_list = {
-        let node_status_map = Rc::clone(&node_satus_map);
         let current_start_node_id = Rc::clone(&current_start_node_id);
         let current_end_node_id = Rc::clone(&current_end_node_id);
         let nodes = Rc::clone(&nodes);
@@ -256,16 +241,15 @@ pub fn Board() -> Html {
                 *is_running.borrow_mut() = false;
             };
 
-            clear_traversed_nodes(&nodes, &node_status_map);
+            clear_traversed_nodes(&nodes);
             let traversed_nodes = dijkstras::get_traversed_nodes(
-                node_status_map.borrow().clone(),
+                &nodes.borrow(),
                 current_start_node_id.borrow().unwrap(),
                 current_end_node_id.borrow().unwrap(),
             );
 
             visualizer::visualize(
                 Rc::clone(&nodes),
-                Rc::clone(&node_status_map),
                 traversed_nodes.visited_ordered,
                 traversed_nodes.path,
                 end_of_visualization_callback,

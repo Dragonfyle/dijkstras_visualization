@@ -1,6 +1,5 @@
 use crate::board::GridNode;
 use crate::utils::{self, ModifierKey};
-use crate::NodeStatus;
 use std::cell::RefCell;
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
@@ -14,16 +13,14 @@ pub trait TouchSquare {
 
 pub struct GridState {
     nodes: Rc<RefCell<Vec<GridNode>>>,
-    node_status_map: Rc<RefCell<Vec<NodeStatus>>>,
     current_start_node_id: Rc<RefCell<Option<usize>>>,
     current_end_node_id: Rc<RefCell<Option<usize>>>,
 }
 
 impl GridState {
-    pub fn new(nodes: Rc<RefCell<Vec<GridNode>>>, node_status_map: Rc<RefCell<Vec<NodeStatus>>>, current_start_node_id: Rc<RefCell<Option<usize>>>, current_end_node_id: Rc<RefCell<Option<usize>>>) -> GridState {
+    pub fn new(nodes: Rc<RefCell<Vec<GridNode>>>, current_start_node_id: Rc<RefCell<Option<usize>>>, current_end_node_id: Rc<RefCell<Option<usize>>>) -> GridState {
         GridState {
             nodes,
-            node_status_map,
             current_start_node_id,
             current_end_node_id,
         }
@@ -69,9 +66,9 @@ impl GridAction {
 
 impl TouchSquare for GridAction {
     fn trigger_node(&self) {
-        let mut node_status_map = self.grid_state.node_status_map.borrow_mut();
-        let grid_status_map_entry = &mut node_status_map[self.node_id];
-        if !utils::is_node_toggleable(&grid_status_map_entry) {
+        let mut nodes_borrow = self.grid_state.nodes.borrow_mut();
+        let node_status = &mut nodes_borrow[self.node_id].node_status;
+        if !utils::is_node_toggleable(node_status) {
             return;
         }
         let current_start_node_id = Rc::clone(&self.grid_state.current_start_node_id);
@@ -80,18 +77,16 @@ impl TouchSquare for GridAction {
 
         match self.button_with_modifier {
             ButtonWithModifierKey::Left(ModifierKey::Ctrl) => {
-                utils::set_node_off(self.html_element.clone(), grid_status_map_entry);
+                utils::set_node_off(self.html_element.clone(), node_status);
             }
             ButtonWithModifierKey::Left(ModifierKey::Shift) => {
-                utils::set_node_on(self.html_element.clone(), grid_status_map_entry);
+                utils::set_node_on(self.html_element.clone(), node_status);
             }
             ButtonWithModifierKey::Left(ModifierKey::None) => {
-                drop(node_status_map);
-                utils::set_start_node(&self.grid_state.nodes, &self.grid_state.node_status_map, self.node_id, current_start_node_id);
+                utils::set_start_node(nodes_borrow, self.node_id, current_start_node_id);
             }
             ButtonWithModifierKey::Right() => {
-                drop(node_status_map);
-                utils::set_end_node(&self.grid_state.nodes, &self.grid_state.node_status_map, self.node_id, current_end_node_id);
+                utils::set_end_node(nodes_borrow, self.node_id, current_end_node_id);
             }
             ButtonWithModifierKey::Other() => {
                 return;

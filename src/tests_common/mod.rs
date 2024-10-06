@@ -1,4 +1,6 @@
-use crate::NodeStatus;
+use yew::{html, NodeRef};
+
+use crate::{board::GridNode, NodeStatus};
 
 pub fn get_mock_grid() -> Vec<usize> {
     vec![
@@ -9,15 +11,15 @@ pub fn get_mock_grid() -> Vec<usize> {
     ]
 }
 
-pub fn get_mock_nodes(mock_grid: Vec<usize>) -> Vec<NodeStatus> {
+pub fn get_mock_nodes(mock_grid: Vec<usize>) -> Vec<GridNode> {
     mock_grid
         .iter()
         .map(|node| match node {
-            0 => NodeStatus::On,
-            1 => NodeStatus::Off,
-            2 => NodeStatus::Start,
-            3 => NodeStatus::End,
-            _ => NodeStatus::On,
+            0 => GridNode {node_status: NodeStatus::On, node: html! {<div></div>}, node_ref: NodeRef::default()},
+            1 => GridNode {node_status: NodeStatus::Off, node: html! {<div></div>}, node_ref: NodeRef::default()},
+            2 => GridNode {node_status: NodeStatus::Start, node: html! {<div></div>}, node_ref: NodeRef::default()},
+            3 => GridNode {node_status: NodeStatus::End, node: html! {<div></div>}, node_ref: NodeRef::default()},
+            _ => GridNode {node_status: NodeStatus::On, node: html! {<div></div>}, node_ref: NodeRef::default()},
         })
         .collect()
 }

@@ -7,7 +7,6 @@ mod dijkstras;
 mod tests_common;
 mod utils;
 mod visualizer;
-mod grid_actions;
 
 const GRID_SIZE: usize = 2500;
 const DEFAULT_COLOR: &str = "bg-gray-700";

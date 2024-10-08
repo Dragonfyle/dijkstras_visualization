@@ -1,13 +1,11 @@
-use crate::board::GridNode;
 use crate::{utils, NodeStatus};
+use crate::board::Nodes;
 use gloo_timers::future::TimeoutFuture;
-use std::cell::RefCell;
-use std::rc::Rc;
 use wasm_bindgen_futures::spawn_local;
 use web_sys::HtmlElement;
 
 pub fn visualize(
-    nodes: Rc<RefCell<Vec<GridNode>>>,
+    nodes: Nodes,
     traversed_nodes: Vec<usize>,
     path: Vec<usize>,
     end_of_visualization_callback: impl Fn() + 'static,

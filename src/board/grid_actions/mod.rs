@@ -1,6 +1,5 @@
-use crate::board::GridNode;
 use crate::utils::{self, ModifierKey};
-use std::cell::RefCell;
+use super::{Nodes, CurrentStartNode, CurrentEndNode};
 use std::rc::Rc;
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
@@ -12,13 +11,13 @@ pub trait TouchSquare {
 }
 
 pub struct GridState {
-    nodes: Rc<RefCell<Vec<GridNode>>>,
-    current_start_node_id: Rc<RefCell<Option<usize>>>,
-    current_end_node_id: Rc<RefCell<Option<usize>>>,
+    nodes: Nodes,
+    current_start_node_id: CurrentStartNode,
+    current_end_node_id: CurrentEndNode,
 }
 
 impl GridState {
-    pub fn new(nodes: Rc<RefCell<Vec<GridNode>>>, current_start_node_id: Rc<RefCell<Option<usize>>>, current_end_node_id: Rc<RefCell<Option<usize>>>) -> GridState {
+    pub fn new(nodes: Nodes, current_start_node_id: CurrentStartNode, current_end_node_id: CurrentEndNode) -> GridState {
         GridState {
             nodes,
             current_start_node_id,

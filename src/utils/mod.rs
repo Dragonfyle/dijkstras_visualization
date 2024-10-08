@@ -1,7 +1,7 @@
 use crate::NodeStatus;
 use crate::{DEFAULT_COLOR, END_COLOR, OFF_COLOR, PATH_COLOR, START_COLOR, VISITED_COLOR};
-use std::rc::Rc;
-use std::cell::{RefCell, RefMut};
+use crate::board::{CurrentStartNode, CurrentEndNode};
+use std::cell::RefMut;
 use crate::board::GridNode;
 use web_sys::HtmlElement;
 use yew::MouseEvent;
@@ -92,7 +92,7 @@ pub fn get_modifier_key(event: &MouseEvent) -> ModifierKey {
 pub fn set_start_node(
     mut nodes: RefMut<Vec<GridNode>>,
     new_start_id: usize,
-    current_start_node_id: Rc<RefCell<Option<usize>>>,
+    current_start_node_id: CurrentStartNode,
 ) {
     if let Some(id) = current_start_node_id.borrow().as_ref() {
         if let Some(previous_start_node) = nodes.get(*id) {
@@ -122,7 +122,7 @@ pub fn set_start_node(
 pub fn set_end_node(
     mut nodes: RefMut<Vec<GridNode>>,
     new_end_id: usize,
-    current_end_node_id: Rc<RefCell<Option<usize>>>,
+    current_end_node_id: CurrentEndNode,
 ) {
     if let Some(id) = current_end_node_id.borrow().as_ref() {
         if let Some(previous_end_node) = nodes.get(*id) {

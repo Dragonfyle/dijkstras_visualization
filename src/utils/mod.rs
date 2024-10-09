@@ -1,10 +1,12 @@
+use std::cell::RefMut;
+
+use web_sys::HtmlElement;
+use yew::MouseEvent;
+
 use crate::NodeStatus;
 use crate::{DEFAULT_COLOR, END_COLOR, OFF_COLOR, PATH_COLOR, START_COLOR, VISITED_COLOR};
 use crate::board::{CurrentStartNode, CurrentEndNode};
-use std::cell::RefMut;
 use crate::board::GridNode;
-use web_sys::HtmlElement;
-use yew::MouseEvent;
 
 pub enum Button {
     Left,
@@ -56,8 +58,8 @@ pub fn set_square_color(node: &HtmlElement, node_status: NodeStatus) {
     }
 }
 
-pub fn set_node_status(node_status_map_entry: &mut NodeStatus, new_status: NodeStatus) {
-    *node_status_map_entry = new_status;
+pub fn set_node_status(node_status: &mut NodeStatus, new_status: NodeStatus) {
+    *node_status = new_status;
 }
 
 pub fn drop_first_and_last<T>(vec: &mut Vec<T>) {
@@ -65,18 +67,18 @@ pub fn drop_first_and_last<T>(vec: &mut Vec<T>) {
     vec.pop();
 }
 
-pub fn set_node_on(node_ref: HtmlElement, node_status_map_entry: &mut NodeStatus) {
+pub fn set_node_on(node_ref: HtmlElement, node_status: &mut NodeStatus) {
     set_square_color(&node_ref, NodeStatus::On);
-    set_node_status(node_status_map_entry, NodeStatus::On);
+    set_node_status(node_status, NodeStatus::On);
 }
 
-pub fn set_node_off(node_ref: HtmlElement, node_status_map_entry: &mut NodeStatus) {
+pub fn set_node_off(node_ref: HtmlElement, node_status: &mut NodeStatus) {
     set_square_color(&node_ref, NodeStatus::Off);
-    set_node_status(node_status_map_entry, NodeStatus::Off);
+    set_node_status(node_status, NodeStatus::Off);
 }
 
-pub fn is_node_toggleable(node_status_map_entry: &NodeStatus) -> bool {
-    *node_status_map_entry == NodeStatus::On || *node_status_map_entry == NodeStatus::Off
+pub fn is_node_toggleable(node_status: &NodeStatus) -> bool {
+    *node_status == NodeStatus::On || *node_status == NodeStatus::Off
 }
 
 pub fn get_modifier_key(event: &MouseEvent) -> ModifierKey {

@@ -1,9 +1,12 @@
-use crate::utils::{self, ModifierKey};
-use super::{Nodes, CurrentStartNode, CurrentEndNode};
 use std::rc::Rc;
+
 use wasm_bindgen::prelude::*;
 use web_sys::HtmlElement;
 use yew::prelude::*;
+
+use crate::utils::{self, ModifierKey};
+
+use super::{Nodes, CurrentStartNode, CurrentEndNode};
 use utils::{Button, ButtonWithModifierKey, MouseAction};
 
 pub trait TouchSquare {

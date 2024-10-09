@@ -1,35 +1,23 @@
-use crate::utils;
-use gloo::console::log;
-use crate::visualizer;
-use crate::{NodeStatus, DEFAULT_COLOR, GRID_SIZE};
+mod grid_actions;
+mod board_utils;
+
 use std::cell::RefCell;
 use std::rc::Rc;
+
+#[allow(unused_imports)]
+use gloo::console::log;
 use web_sys::HtmlElement;
 use yew::prelude::*;
-use yew::virtual_dom::VNode;
 use yew::{Html, NodeRef};
+
 use crate::dijkstras::DijkstrasTraversal;
+use crate::utils;
+use crate::visualizer;
+use crate::{NodeStatus, DEFAULT_COLOR, GRID_SIZE};
 use crate::utils::MouseAction;
-use crate::board::grid_actions::{GridAction, GridState, TouchSquare};
 
-mod grid_actions;
-
-pub type Nodes = Rc<RefCell<Vec<GridNode>>>;
-pub type CurrentStartNode = Rc<RefCell<Option<usize>>>;
-pub type CurrentEndNode = Rc<RefCell<Option<usize>>>;
-
-pub struct GridNode {
-    pub node: VNode,
-    pub node_ref: NodeRef,
-    pub node_status: NodeStatus,
-}
-
-enum BoardStatus {
-    Empty,
-    NotVisualized,
-    Visualizing,
-    Visualized,
-}
+use grid_actions::{GridAction, GridState, TouchSquare};
+pub use board_utils::{GridNode, Nodes, CurrentStartNode, CurrentEndNode, BoardStatus, CLICK, CONTEXT_MENU, MOUSE_OVER};
 
 impl GridNode {
     pub fn build(id: usize) -> Self {
@@ -88,9 +76,14 @@ pub fn Board() -> Html {
 
         Callback::from(move |event: MouseEvent| {
             event.prevent_default();
+
+            if let BoardStatus::Visualizing | BoardStatus::Visualized = *board_status.borrow() {
+                return;
+            }
+
             let mouse_action = match event.type_().as_str() {
-                "click" | "contextmenu" => MouseAction::Click,
-                "mouseover" => MouseAction::Move,
+                CLICK | CONTEXT_MENU => MouseAction::Click,
+                MOUSE_OVER => MouseAction::Move,
                 _ => return,
             };
 
@@ -134,12 +127,12 @@ pub fn Board() -> Html {
                 .node_ref
                 .cast::<HtmlElement>()
             {
-                let node_status_map_entry = &mut nodes_borrow[i].node_status;
-                if *node_status_map_entry == NodeStatus::Visited
-                    || *node_status_map_entry == NodeStatus::Path
+                let node_status = &mut nodes_borrow[i].node_status;
+                if *node_status == NodeStatus::Visited
+                    || *node_status == NodeStatus::Path
                 {
                     utils::set_square_color(&node_ref, NodeStatus::On);
-                    utils::set_node_status(node_status_map_entry, NodeStatus::On);
+                    utils::set_node_status(node_status, NodeStatus::On);
                 }
             }
         })
@@ -267,6 +260,7 @@ pub fn Board() -> Html {
                         <button class="text-white border-2 border-emerald-900 p-2 rounded-md hover:bg-emerald-900 hover:text-black" onclick={handle_clear_traversed_nodes}>{"Clear Path"}</button>
                         <button class="text-white border-2 border-red-800 p-2 rounded-md hover:bg-red-800 hover:text-black" onclick={handle_reset_board}>{"Reset board"}</button>
                     </div>
+
                     <div class="flex items-center flex-col gap-2 text-zinc-500">
                         <p>{"Left Click: "}<span class="pl-4">{"set "}</span><span class="text-green-500">{"start "}</span><span>{" node"}</span></p>
                         <p>{"Right Click: "}<span class="pl-4">{"set "}</span><span class="text-red-700">{"end"}</span><span>{" node"}</span></p>

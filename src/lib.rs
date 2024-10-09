@@ -1,5 +1,3 @@
-use board::Board;
-
 mod adjacency_list;
 mod board;
 mod dijkstras;
@@ -7,6 +5,9 @@ mod dijkstras;
 mod tests_common;
 mod utils;
 mod visualizer;
+
+use board::Board;
+
 
 const GRID_SIZE: usize = 2500;
 const DEFAULT_COLOR: &str = "bg-gray-700";

@@ -1,7 +1,9 @@
+use priority_queue::{self, DoublePriorityQueue};
+
 use crate::board::GridNode;
 use crate::utils;
 use crate::{adjacency_list, adjacency_list::AdjacencyEntry};
-use priority_queue::{self, DoublePriorityQueue};
+
 
 pub struct DijkstrasTraversal {
     path: Vec<usize>,
